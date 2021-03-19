@@ -44,7 +44,7 @@ class ListActivity : AppCompatActivity() {
 
         viewModel.results.observe(this, {
             it?.let { response ->
-                customAdapter = ListAdapter(applicationContext, response)
+                customAdapter = response.items?.let { it1 -> ListAdapter(applicationContext, it1) }
                 binding.recycleView.adapter = customAdapter
             }
         })
@@ -52,7 +52,7 @@ class ListActivity : AppCompatActivity() {
         viewModel.responseStatus.observe(this, {
             it?.let { response ->
                 if (!response) {
-                    Toast.makeText(this, R.string.response_error_message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, R.string.response_error_message, Toast.LENGTH_SHORT).show()
                 }
             }
         })

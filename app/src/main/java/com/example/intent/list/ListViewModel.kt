@@ -11,32 +11,28 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.*
 
 class ListViewModel : ViewModel() {
 
-    val results: MutableLiveData<ArrayList<GitHubSearchModel.GitHubSearchItemModel>> = MutableLiveData()
+    val results: MutableLiveData<GitHubSearchModel> = MutableLiveData()
     val responseStatus = MutableLiveData<Boolean>().apply { value = true }
 
     fun searchByName(movieName: String) {
         val retrofit = Retrofit.Builder()
-            .baseUrl(Constant.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+                .baseUrl(Constant.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
         val service = retrofit.create(APIInterface::class.java)
         val call = service.searchRepo(movieName)
         call.enqueue(object : Callback<GitHubSearchModel?> {
             override fun onResponse(
-                call: Call<GitHubSearchModel?>,
-                response: Response<GitHubSearchModel?>
+                    call: Call<GitHubSearchModel?>,
+                    response: Response<GitHubSearchModel?>
             ) {
                 if (response.code() == 200) {
-                    if (response.body() != null) {
-                        val jsonObject = response.body()
-                        if (jsonObject != null) {
-                            results.value = jsonObject.items
-                            responseStatus.value = true
-                        }
+                    response.body().let {
+                        results.value = response.body()
+                        responseStatus.value = true
                     }
                 } else {
                     responseStatus.value = false
